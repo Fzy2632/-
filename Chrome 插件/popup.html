@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Website Time Tracker</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>📊 网站时间追踪</h1>
+    </header>
+    
+    <div class="tabs">
+      <button class="tab-button active" data-tab="today">今天</button>
+      <button class="tab-button" data-tab="all">全部</button>
+    </div>
+    
+    <div class="tab-content active" id="today-tab">
+      <div class="stats-cards">
+        <div class="stat-card">
+          <div class="stat-label">总访问时长</div>
+          <div class="stat-value" id="today-total">0秒</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">访问网站数</div>
+          <div class="stat-value" id="today-count">0</div>
+        </div>
+      </div>
+      <h2>今天访问时间最长的网站</h2>
+      <div id="today-stats" class="stats-container"></div>
+    </div>
+    
+    <div class="tab-content" id="all-tab">
+      <div class="stats-cards">
+        <div class="stat-card">
+          <div class="stat-label">总访问时长</div>
+          <div class="stat-value" id="all-total">0秒</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">访问网站数</div>
+          <div class="stat-value" id="all-count">0</div>
+        </div>
+      </div>
+      <h2>全部网站使用情况</h2>
+      <div id="all-stats" class="stats-container"></div>
+    </div>
+    
+    <canvas id="chart" width="350" height="200"></canvas>
+    
+    <div class="actions">
+      <button id="open-details-btn" class="btn btn-primary">打开详细页面</button>
+      <button id="clear-today-btn" class="btn btn-danger">清除今天数据</button>
+      <button id="clear-all-btn" class="btn btn-danger">清除所有数据</button>
+    </div>
+  </div>
+  
+  <script src="popup.js"></script>
+</body>
+</html>
+

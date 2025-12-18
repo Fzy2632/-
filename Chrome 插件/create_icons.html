@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>生成图标</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: 50px auto;
+      padding: 20px;
+    }
+    canvas {
+      border: 1px solid #ddd;
+      margin: 10px;
+      display: block;
+    }
+    button {
+      padding: 10px 20px;
+      background: #667eea;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    button:hover {
+      background: #5568d3;
+    }
+    .container {
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>生成图标文件</h1>
+    <p>点击按钮生成图标，然后右键保存到 icons 文件夹</p>
+    
+    <canvas id="icon16" width="16" height="16"></canvas>
+    <button onclick="downloadIcon('icon16', 'icon16.png')">下载 16x16 图标</button>
+    
+    <canvas id="icon48" width="48" height="48"></canvas>
+    <button onclick="downloadIcon('icon48', 'icon48.png')">下载 48x48 图标</button>
+    
+    <canvas id="icon128" width="128" height="128"></canvas>
+    <button onclick="downloadIcon('icon128', 'icon128.png')">下载 128x128 图标</button>
+    
+    <p style="margin-top: 30px;">
+      <button onclick="generateAllIcons()">一次性下载所有图标</button>
+    </p>
+  </div>
+
+  <script>
+    function drawIcon(canvas, size) {
+      const ctx = canvas.getContext('2d');
+      
+      // 背景渐变
+      const gradient = ctx.createLinearGradient(0, 0, size, size);
+      gradient.addColorStop(0, '#667eea');
+      gradient.addColorStop(1, '#764ba2');
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, size, size);
+      
+      // 绘制时钟
+      const centerX = size / 2;
+      const centerY = size / 2;
+      const radius = size * 0.35;
+      
+      // 外圈
+      ctx.strokeStyle = 'white';
+      ctx.lineWidth = size * 0.05;
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+      ctx.stroke();
+      
+      // 时针
+      ctx.strokeStyle = 'white';
+      ctx.lineWidth = size * 0.06;
+      ctx.beginPath();
+      ctx.moveTo(centerX, centerY);
+      ctx.lineTo(centerX, centerY - radius * 0.5);
+      ctx.stroke();
+      
+      // 分针
+      ctx.strokeStyle = 'white';
+      ctx.lineWidth = size * 0.05;
+      ctx.beginPath();
+      ctx.moveTo(centerX, centerY);
+      ctx.lineTo(centerX + radius * 0.6, centerY);
+      ctx.stroke();
+      
+      // 中心点
+      ctx.fillStyle = 'white';
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, size * 0.08, 0, Math.PI * 2);
+      ctx.fill();
+      
+      // 添加装饰点
+      const dotRadius = size * 0.02;
+      const positions = [
+        [centerX, centerY - radius],
+        [centerX + radius, centerY],
+        [centerX, centerY + radius],
+        [centerX - radius, centerY]
+      ];
+      
+      ctx.fillStyle = 'white';
+      positions.forEach(([x, y]) => {
+        ctx.beginPath();
+        ctx.arc(x, y, dotRadius, 0, Math.PI * 2);
+        ctx.fill();
+      });
+    }
+    
+    function generateAllIcons() {
+      const canvases = ['icon16', 'icon48', 'icon128'];
+      canvases.forEach(canvasName => {
+        const canvas = document.getElementById(canvasName);
+        const size = canvas.width;
+        drawIcon(canvas, size);
+      });
+      
+      // 自动下载
+      canvases.forEach(canvasName => {
+        setTimeout(() => {
+          downloadIcon(canvasName, `icon${canvasName.replace('icon', '')}.png`);
+        }, 100);
+      });
+    }
+    
+    function downloadIcon(canvasId, filename) {
+      const canvas = document.getElementById(canvasId);
+      const size = parseInt(canvasId.replace('icon', ''));
+      drawIcon(canvas, size);
+      
+      canvas.toBlob((blob) => {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        a.click();
+        URL.revokeObjectURL(url);
+      });
+    }
+    
+    // 页面加载时生成图标预览
+    window.onload = function() {
+      const canvases = ['icon16', 'icon48', 'icon128'];
+      canvases.forEach(canvasName => {
+        const canvas = document.getElementById(canvasName);
+        const size = canvas.width;
+        drawIcon(canvas, size);
+      });
+    };
+  </script>
+</body>
+</html>
+

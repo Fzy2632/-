@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>网站时间追踪器 - 详细信息</title>
+  <link rel="stylesheet" href="options.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>📊 网站时间追踪器</h1>
+      <p>详细统计数据和管理</p>
+    </header>
+
+    <nav class="tabs">
+      <button class="tab-button active" data-tab="today">今天</button>
+      <button class="tab-button" data-tab="week">本周</button>
+      <button class="tab-button" data-tab="month">本月</button>
+      <button class="tab-button" data-tab="all">全部</button>
+    </nav>
+
+    <div class="content">
+      <!-- 今天 -->
+      <div class="tab-content active" id="today-content">
+        <div class="stats-cards">
+          <div class="stat-card">
+            <div class="stat-label">总访问时长</div>
+            <div class="stat-value" id="today-total">0秒</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">访问网站数</div>
+            <div class="stat-value" id="today-count">0</div>
+          </div>
+        </div>
+        <h2>网站详情</h2>
+        <div id="today-stats" class="stats-list"></div>
+        <canvas id="today-chart" width="800" height="300"></canvas>
+      </div>
+
+      <!-- 本周 -->
+      <div class="tab-content" id="week-content">
+        <div class="stats-cards">
+          <div class="stat-card">
+            <div class="stat-label">总访问时长</div>
+            <div class="stat-value" id="week-total">0秒</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">访问网站数</div>
+            <div class="stat-value" id="week-count">0</div>
+          </div>
+        </div>
+        <h2>网站详情</h2>
+        <div id="week-stats" class="stats-list"></div>
+        <canvas id="week-chart" width="800" height="350"></canvas>
+      </div>
+
+      <!-- 本月 -->
+      <div class="tab-content" id="month-content">
+        <div class="stats-cards">
+          <div class="stat-card">
+            <div class="stat-label">总访问时长</div>
+            <div class="stat-value" id="month-total">0秒</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">访问网站数</div>
+            <div class="stat-value" id="month-count">0</div>
+          </div>
+        </div>
+        <h2>网站详情</h2>
+        <div id="month-stats" class="stats-list"></div>
+        <canvas id="month-chart" width="800" height="350"></canvas>
+      </div>
+
+      <!-- 全部 -->
+      <div class="tab-content" id="all-content">
+        <div class="stats-cards">
+          <div class="stat-card">
+            <div class="stat-label">总访问时长</div>
+            <div class="stat-value" id="all-total">0秒</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">访问网站数</div>
+            <div class="stat-value" id="all-count">0</div>
+          </div>
+        </div>
+        <h2>网站详情</h2>
+        <div id="all-stats" class="stats-list"></div>
+        <canvas id="all-chart" width="800" height="350"></canvas>
+      </div>
+    </div>
+
+    <div class="actions-panel">
+      <button id="export-btn" class="btn btn-primary">导出数据</button>
+      <button id="import-btn" class="btn btn-secondary">导入数据</button>
+      <input type="file" id="import-file" style="display:none" accept=".json">
+      <button id="clear-today-btn" class="btn btn-warning">清除今天</button>
+      <button id="clear-all-btn" class="btn btn-danger">清除所有</button>
+    </div>
+
+    <div class="footer">
+      <p>数据存储在本地，完全隐私保护 | 
+         <a href="#" id="open-settings">设置</a>
+      </p>
+    </div>
+  </div>
+
+  <script src="options.js"></script>
+</body>
+</html>
+
