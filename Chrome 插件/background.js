@@ -21,6 +21,7 @@ function getDomain(url) {
 
 // 保存时间数据
 function saveTime(domain, duration) {
+  console.log("saveTime", domain, duration);
   if (!domain) return;
   
   const now = new Date();
@@ -55,11 +56,28 @@ chrome.tabs.onActivated.addListener((activeInfo) => {
   });
 });
 
+// chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+//   if (changeInfo.status === 'complete' && tab.active) {
+//     updateActiveTab(tab);
+//   }
+// });
+
+// 监听标签页更新（合并：URL变化与加载完成）
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-  if (changeInfo.status === 'complete' && tab.active) {
+  if (!tab.active) return;
+
+  // URL变化（包含跨域跳转、同域不同路径）
+  if (changeInfo.url) {
+    updateActiveTab(tab);
+    return;
+  }
+
+  // 仅在“加载完成”时兜底（例如刷新、首次加载但没有 url 字段的情况）
+  if (changeInfo.status === 'complete') {
     updateActiveTab(tab);
   }
 });
+
 
 // 更新活动标签
 function updateActiveTab(tab) {
@@ -104,18 +122,18 @@ setInterval(() => {
 }, 30000);
 
 // 监听标签页更新
-chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-  if (changeInfo.url && tab.active) {
-    const domain = getDomain(tab.url);
-    if (domain && domain !== currentDomain) {
-      // 域名改变了，保存之前的数据
-      if (currentDomain && startTime) {
-        const duration = Math.floor((Date.now() - startTime) / 1000);
-        saveTime(currentDomain, duration);
-      }
-      currentDomain = domain;
-      startTime = Date.now();
-    }
-  }
-});
+// chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+//   if (changeInfo.url && tab.active) {
+//     const domain = getDomain(tab.url);
+//     if (domain && domain !== currentDomain) {
+//       // 域名改变了，保存之前的数据
+//       if (currentDomain && startTime) {
+//         const duration = Math.floor((Date.now() - startTime) / 1000);
+//         saveTime(currentDomain, duration);
+//       }
+//       currentDomain = domain;
+//       startTime = Date.now();
+//     }
+//   }
+// });
 
