@@ -879,7 +879,8 @@ document.getElementById('clear-today-btn').addEventListener('click', async () =>
     const keysToRemove = [];
     
     for (let key in data) {
-      if (key.endsWith(`_${today}`)) {
+      // 清除所有与今天相关的键，包括域名键、daytotal和bucket2h
+      if (key.endsWith(`_${today}`) || key.startsWith(`daytotal_${today}`) || key.startsWith(`bucket2h_${today}`)) {
         keysToRemove.push(key);
       }
     }
