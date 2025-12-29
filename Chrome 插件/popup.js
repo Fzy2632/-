@@ -240,7 +240,7 @@ async function drawWeekChart() {
   ctx.fillStyle = '#333';
   ctx.font = 'bold 16px -apple-system';
   ctx.textAlign = 'center';
-  ctx.fillText(`本周平均每天 ${formatTime(averageSeconds)}`, canvas.width / 2, 25);
+  ctx.fillText(`过去七天平均每天 ${formatTime(averageSeconds)}`, canvas.width / 2, 25);
   
   // 绘制平均水平线（先绘制，确保穿过所有柱子）
   ctx.strokeStyle = '#003399'; // 蓝色虚线
@@ -460,4 +460,5 @@ document.getElementById('open-details-btn').addEventListener('click', () => {
 document.addEventListener('DOMContentLoaded', () => {
   displayTodayData();
 });
+
 
