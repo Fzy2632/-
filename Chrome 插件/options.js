@@ -302,7 +302,7 @@ function drawStyledWeekChart(canvasId, weekData, averageSeconds, title) {
   ctx.font = 'bold 18px -apple-system';
   ctx.textAlign = 'center';
   ctx.fillText(title, canvas.width / 2, 25);
-  
+    
   // 绘制平均水平线（先绘制，确保穿过所有柱子）
   ctx.strokeStyle = '#003399'; // 蓝色虚线
   ctx.lineWidth = 1;
@@ -426,7 +426,7 @@ async function drawTodayTwoHourChart() {
   ctx.fillStyle = '#333';
   ctx.font = 'bold 18px -apple-system';
   ctx.textAlign = 'center';
-  ctx.fillText(formatTime(dayTotal), canvas.width / 2, 25);
+  ctx.fillText(`今天共上网 ${formatTime(dayTotal)}`, canvas.width / 2, 25);
   
   // 绘制6小时分割线
   ctx.strokeStyle = '#E0E0E0';
@@ -501,10 +501,18 @@ async function drawWeekDailyChartWithStyled() {
   let totalSeconds = 0;
   let validDays = 0;
   
-  // 获取从今天开始往前7天的数据（与弹窗界面一致）
-  for (let i = 6; i >= 0; i--) {
-    const date = new Date(today);
-    date.setDate(today.getDate() - i);
+  // 获取本周一至今的数据
+  const todayDayOfWeek = today.getDay(); // 0=周日, 1=周一, ..., 6=周六
+  const daysSinceMonday = todayDayOfWeek === 0 ? 6 : todayDayOfWeek - 1;
+  
+  // 本周一的日期
+  const mondayDate = new Date(today);
+  mondayDate.setDate(today.getDate() - daysSinceMonday);
+  
+  // 获取本周完整7天（周一到周日）的数据
+  for (let i = 0; i < 7; i++) {
+    const date = new Date(mondayDate);
+    date.setDate(mondayDate.getDate() + i);
     const dateStr = date.toISOString().split('T')[0];
     let daySeconds = 0;
     
@@ -520,14 +528,15 @@ async function drawWeekDailyChartWithStyled() {
       }
     }
     
-    if (daySeconds > 0) {
+    // 只计算今天及之前的数据
+    if (daySeconds > 0 && i <= daysSinceMonday) {
       totalSeconds += daySeconds;
       validDays++;
     }
     
     weekChartData.push({
       date: dateStr,
-      label: ['周日','周一','周二','周三','周四','周五','周六'][date.getDay()],
+      label: ['周一','周二','周三','周四','周五','周六','周日'][i],
       seconds: daySeconds
     });
   }
@@ -535,7 +544,7 @@ async function drawWeekDailyChartWithStyled() {
   const averageSeconds = validDays > 0 ? Math.round(totalSeconds / validDays) : 0;
   
   // 绘制iPhone风格图表
-  drawStyledWeekChart('week-chart', weekChartData, averageSeconds, '本周上网时长');
+  drawStyledWeekChart('week-chart', weekChartData, averageSeconds, `本周平均每天上网 ${formatTime(averageSeconds)}`);
 }
 
 // 绘制带iPhone风格的月份图表
@@ -604,10 +613,12 @@ async function drawMonthChartWithStyled() {
     }
   }
   
-  const averageSeconds = validDays > 0 ? Math.round(totalSeconds / validDays) : 0;
+  // 按周计算平均值（每周的总秒数）
+  const totalWeekSeconds = weekGroups.reduce((sum, week) => sum + week.seconds, 0);
+  const averageSeconds = weekGroups.length > 0 ? Math.round(totalWeekSeconds / weekGroups.length) : 0;
   
   // 使用新的iPhone风格绘制函数
-  drawStyledWeekChart('month-chart', weekGroups, averageSeconds, '本月上网时长');
+  drawStyledWeekChart('month-chart', weekGroups, averageSeconds, `本月平均每周上网 ${formatTime(averageSeconds)}`);
 }
 
 // 绘制带iPhone风格的全部数据图表
@@ -656,33 +667,37 @@ async function drawAllChartWithStyled() {
     }
   }
   
-  // 计算总时间和平均每月时间
-  for (let monthKey in monthTotals) {
-    totalSeconds += monthTotals[monthKey];
-    validMonths++;
-  }
-  
-  const averageSeconds = validMonths > 0 ? Math.round(totalSeconds / validMonths) : 0;
-  
-  // 准备图表数据
-  const monthGroups = [];
-  for (let monthKey in monthTotals) {
+  // 计算总时间和平均每月时间（只计算最近12个月）
+  const monthArray = Object.entries(monthTotals).map(([monthKey, seconds]) => {
     const [year, month] = monthKey.split('-');
-    monthGroups.push({
-      label: `${parseInt(month)}月`,
-      seconds: monthTotals[monthKey]
-    });
-  }
-  
-  // 按月份排序
-  monthGroups.sort((a, b) => {
-    const aMonth = parseInt(a.label.replace('月', ''));
-    const bMonth = parseInt(b.label.replace('月', ''));
-    return aMonth - bMonth;
+    return {
+      monthKey,
+      year: parseInt(year),
+      month: parseInt(month),
+      seconds,
+      date: new Date(parseInt(year), parseInt(month) - 1)
+    };
   });
   
+  // 按日期排序
+  monthArray.sort((a, b) => a.date - b.date);
+  
+  // 只保留最近12个月
+  const recentMonths = monthArray.slice(-12);
+  
+  // 计算总时间和月份数
+  totalSeconds = recentMonths.reduce((sum, m) => sum + m.seconds, 0);
+  const monthCount = recentMonths.length;
+  const averageSeconds = monthCount > 0 ? Math.round(totalSeconds / monthCount) : 0;
+  
+  // 准备图表数据
+  const monthGroups = recentMonths.map(m => ({
+    label: `${m.month}月`,
+    seconds: m.seconds
+  }));
+  
   // 使用新的iPhone风格绘制函数
-  drawStyledWeekChart('all-chart', monthGroups, averageSeconds, '全部上网时长');
+  drawStyledWeekChart('all-chart', monthGroups, averageSeconds, `平均每月上网 ${formatTime(averageSeconds)}`);
 }
 
 // 原始的周图表函数，保留作为参考
